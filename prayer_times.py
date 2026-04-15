@@ -16,7 +16,7 @@ def get_prayer_times():
     fetch = requests.get(
         server_api)
 
-    jsoned_data = fetch.json
+    jsoned_data = fetch.json()
     data = jsoned_data["data"]
     times = data["times"]
     needed_data_keys = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"]
