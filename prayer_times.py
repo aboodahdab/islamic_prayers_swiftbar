@@ -4,6 +4,7 @@ import requests
 import os
 from datetime import datetime, timedelta, date
 now = datetime.now().time().replace(microsecond=0)
+day_in_the_week=datetime.now().strftime("%A")
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
@@ -51,7 +52,9 @@ def time_comparison(client_time, api_times, prayers):
         if client_time < date_format_time:
             next_time = date_format_time.strftime("%H:%M")
             prayer_name = next(k for k, v in prayers.items() if v == time)
-
+            if day_in_the_week.lower()=="friday" and prayer_name.lower()=="dhuhr":
+                print(f"Friday - {next_time}")
+                break
             print(f"{prayer_name} - {next_time}")
             break
 
