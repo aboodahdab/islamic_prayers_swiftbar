@@ -41,25 +41,27 @@ def get_tomorrow_fajr(date):
 
 
 def time_comparison(client_time, api_times, prayers):
-    print(api_times)
     isha = datetime.strptime(api_times[len(api_times)-1], "%H:%M").time()
 
     for time in api_times:
 
-        date_format_time = datetime.strptime(time, "%H:%M").time()
+        date_format_time = datetime.strptime(
+            time, "%H:%M").time()
 
         if client_time < date_format_time:
-            next_time = date_format_time
+            next_time = date_format_time.strftime("%H:%M")
             prayer_name = next(k for k, v in prayers.items() if v == time)
-            print(next_time, prayer_name)
+
+            print(f"{prayer_name} - {next_time}")
             break
 
     if client_time > isha:
         tomorrow = date.today() + timedelta(days=1)
-        print(get_tomorrow_fajr(tomorrow))
-        print("fajr prayer ")
-
-# print(type(current_time))
+        prayer_time = get_tomorrow_fajr(tomorrow)
+        print(f"Fajr — {prayer_time}")
 
 
 get_prayer_times()
+# csv
+# txt
+# py
