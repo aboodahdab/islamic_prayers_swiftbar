@@ -1,0 +1,13 @@
+/venv
+.env
+.gitignore
+README.md
+requirements.txt
+env
+*.txt
+*.md
+*cvg
+/env
+env
+*.json
+data.json
