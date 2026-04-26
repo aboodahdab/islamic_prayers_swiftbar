@@ -1,19 +1,31 @@
-#!/usr/bin/env /Users/abdullatif/swiftbar_folder/venv/bin/python
-# echo "☀️ My Plugin"
-# echo "---"
+#!/usr/bin/env /Users/abdullatif/swiftbar_folder/.venv/bin/python
 
-# This item has a submenu — hovering/clicking it reveals options to the side
-# echo "Appearance"
-# echo "-- Disable Dark Mode | bash='osascript -e \"tell app \"System Events\" to tell appearance preferences to set dark mode to false\"' terminal=false refresh=true"
-# echo "-- Enable Dark Mode  | bash='osascript -e \"tell app \"System Events\" to tell appearance preferences to set dark mode to true\"' terminal=false refresh=true"
+import platform
 from datetime import datetime, timedelta, date
 import sys
 from dotenv import load_dotenv
 import requests
 import os
 import json
+import subprocess
+
+running_os = platform.system()
+print(os)
+
 args = sys.argv
-fileName = "tmp/data.json"
+time_mode_24 = True
+
+fileName = "/tmp/data.json"
+if len(args) > 1:
+    if args[1] == "am-pm":
+        time_mode_24 = False
+        with open('/Users/abdullatif/swiftbar_folder/debug.txt', 'w') as f:
+            f.write(str(sys.argv))
+    if args[1] == "24-hour":
+        time_mode_24 = True
+        with open('/Users/abdullatif/swiftbar_folder/debug.txt', 'w') as f:
+            f.write(str(sys.argv))
+    sys.exit()
 
 now = datetime.now().time().replace(microsecond=0)
 day_in_the_week = datetime.now().strftime("%A")
@@ -45,7 +57,7 @@ def get_prayer_times():
 
             kept_values = cached_data["values"]
             values = list(kept_values.values())
-            print(values, kept_values)
+
             time_comparison(now, values, kept_values)
             return
     fetch = requests.get(
@@ -82,6 +94,12 @@ def get_tomorrow_fajr(date):
     return prayer_time
 
 
+def make_a_notification(title, msg):
+
+    subprocess.run(
+        ["osascript", "-e", f'display notification "{msg}" with title "{title}" '])
+
+
 def time_comparison(client_time, api_times, prayers):
     isha = datetime.strptime(api_times[len(api_times)-1], "%H:%M").time()
 
@@ -94,19 +112,26 @@ def time_comparison(client_time, api_times, prayers):
             next_time = date_format_time.strftime("%H:%M")
             prayer_name = next(k for k, v in prayers.items() if v == time)
             if day_in_the_week.lower() == "friday" and prayer_name.lower() == "dhuhr":
-                print(f"Friday - {next_time}")
+                print(f"Jumaa - {next_time}")
+                make_a_notification(
+                    f"Salah Jumaa - {next_time}.", "Jumaa prayer.")
                 break
             print(f"{prayer_name} - {next_time}")
+            make_a_notification(
+                f"Salah {prayer_name} - {next_time}.", f"{prayer_name} prayer.")
+
+            print("---")
+            print("pm-am | bash='/bin/bash' param1='-c' param2='/Users/abdullatif/swiftbar_folder/.venv/bin/python /Users/abdullatif/swiftbar_folder/prayer_times.py am-pm' terminal=false")
+            print("24-hour| bash='/bin/bash' param1='-c' param2='/Users/abdullatif/swiftbar_folder/.venv/bin/python /Users/abdullatif/swiftbar_folder/prayer_times.py 24-hour' terminal=false")
+
             break
 
     if client_time > isha:
         tomorrow = date.today() + timedelta(days=1)
         prayer_time = get_tomorrow_fajr(tomorrow)
-        print(f"Fajr — {prayer_time}") 
-        print(
-            f"---")
-        print("pm-am")
-        print("24-hhours")
+        print(f"Fajr — {prayer_time}")
+        make_a_notification(
+            f"Salah Fajr - {prayer_time}.", "Fajr prayer.")
 
 
 get_prayer_times()
