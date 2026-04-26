@@ -1,1 +1,1 @@
-['/Users/abdullatif/swiftbar_folder/prayer_times.py', 'am-pm']
+['prayer_times.1m.py']
